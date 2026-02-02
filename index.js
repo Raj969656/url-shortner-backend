@@ -4,22 +4,31 @@ const { connectToMongoDB } = require("./connect");
 const urlRoute = require("./routes/url");
 
 const app = express();
-const PORT = 8001;
+const PORT = process.env.PORT || 8001;
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    credentials: true,
+    origin: "*",
+    methods: ["GET", "POST", "PATCH"],
   })
 );
 
 app.use(express.json());
 
-connectToMongoDB("mongodb://127.0.0.1:27017/short-url")
-  .then(() => console.log("Connected to MongoDB"));
+// 🔥 USE ENV VARIABLE ONLY
+connectToMongoDB(process.env.MONGO_URL)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => {
+    console.error("MongoDB connection failed:", err);
+    process.exit(1);
+  });
 
 app.use("/url", urlRoute);
 
-app.listen(PORT, () =>
-  console.log("Server Started at PORT", PORT)
-);
+app.get("/", (req, res) => {
+  res.send("Backend is running");
+});
+
+app.listen(PORT, () => {
+  console.log("Server Started at PORT", PORT);
+});
