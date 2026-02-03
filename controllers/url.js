@@ -65,9 +65,9 @@ async function getUserUrls(req, res) {
     res.status(500).json({ error: "Failed to fetch URLs" });
   }
 }
-
 module.exports = {
   handleGenerateShortURL,
   handleRedirect,
   getUserUrls,
 };
+
