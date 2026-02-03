@@ -7,40 +7,16 @@ const urlSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-
-    redirectURL: {
+    redirectUrl: {
       type: String,
       required: true,
     },
-
     userId: {
       type: String,
-      default: null,
     },
-
-    // 🔥 OPTIONAL UNIQUE FIELD (SAFE)
-    customAlias: {
-      type: String,
-      unique: true,
-      sparse: true, // IMPORTANT
-    },
-
-    expiresAt: {
-      type: Date,
-      default: null,
-    },
-
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-
     visitHistory: [
       {
-        timestamp: {
-          type: Number,
-          required: true,
-        },
+        timestamp: Number,
       },
     ],
   },
