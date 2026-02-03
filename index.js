@@ -6,20 +6,13 @@ const urlRoute = require("./routes/url");
 const app = express();
 const PORT = process.env.PORT || 8001;
 
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST", "PATCH"],
-  })
-);
-
+app.use(cors({ origin: "*", methods: ["GET", "POST"] }));
 app.use(express.json());
 
-// 🔥 USE ENV VARIABLE ONLY
 connectToMongoDB(process.env.MONGO_URL)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => {
-    console.error("MongoDB connection failed:", err);
+    console.error("MongoDB error:", err);
     process.exit(1);
   });
 
