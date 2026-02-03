@@ -12,62 +12,51 @@ async function handleGenerateShortURL(req, res) {
 
     const shortId = customAlias || shortid.generate();
 
-    // 🔴 duplicate alias check
     const exists = await Url.findOne({ shortId });
     if (exists) {
       return res.status(409).json({ error: "Alias already exists" });
     }
 
-    const newUrl = await Url.create({
+    await Url.create({
       shortId,
       redirectUrl: url,
       userId,
       visitHistory: [],
     });
 
-    return res.status(201).json({ shortId: newUrl.shortId });
+    return res.status(201).json({ shortId });
   } catch (err) {
-    console.error("CREATE URL ERROR:", err);
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 }
 
 async function handleRedirect(req, res) {
-  try {
-    const { shortId } = req.params;
+  const { shortId } = req.params;
 
-    const entry = await Url.findOneAndUpdate(
-      { shortId },
-      { $push: { visitHistory: { timestamp: Date.now() } } },
-      { new: true }
-    );
+  const entry = await Url.findOneAndUpdate(
+    { shortId },
+    { $push: { visitHistory: { timestamp: Date.now() } } },
+    { new: true }
+  );
 
-    if (!entry) {
-      return res.status(404).send("Short URL not found");
-    }
-
-    // ✅ YAHI REAL REDIRECT HOGA
-    return res.redirect(entry.redirectUrl);
-  } catch (err) {
-    console.error("REDIRECT ERROR:", err);
-    res.status(500).send("Redirect failed");
+  if (!entry) {
+    return res.status(404).send("Short URL not found");
   }
+
+  return res.redirect(entry.redirectUrl);
 }
 
 async function getUserUrls(req, res) {
-  try {
-    const userId = req.headers["x-user-id"];
-    if (!userId) return res.json([]);
+  const userId = req.headers["x-user-id"];
+  if (!userId) return res.json([]);
 
-    const urls = await Url.find({ userId }).sort({ createdAt: -1 });
-    res.json(urls);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch URLs" });
-  }
+  const urls = await Url.find({ userId }).sort({ createdAt: -1 });
+  res.json(urls);
 }
+
 module.exports = {
   handleGenerateShortURL,
   handleRedirect,
   getUserUrls,
 };
-
